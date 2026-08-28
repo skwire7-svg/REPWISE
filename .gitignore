@@ -1,0 +1,21 @@
+node_modules/
+.next/
+out/
+build/
+.DS_Store
+
+# env — never commit these, they hold the Anthropic and Supabase service keys
+.env
+.env.local
+.env*.local
+
+*.tsbuildinfo
+next-env.d.ts
+.vercel
+
+# Local dev-mode account store (see lib/dev-auth/). Contains real password
+# hashes for local test accounts — never commit it.
+.dev-data/
+
+# Local dev server log
+.dev-server.log

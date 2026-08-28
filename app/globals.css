@@ -1,0 +1,296 @@
+@import "tailwindcss";
+
+/*
+ * Repwise design tokens.
+ *
+ * The palette is defined twice — once on :root (light) and once on .dark — and
+ * then aliased into Tailwind through `@theme inline`. Because the utilities
+ * resolve to var(--token) rather than a baked hex, every existing class in the
+ * app (bg-surface, text-muted, border-line, ...) follows the theme class on
+ * <html> with no per-component `dark:` variants. Add colours here rather than
+ * hard-coding hex values in components.
+ *
+ * next-themes sets that class; the app defaults to dark, which is how the
+ * product was designed, with light as an opt-in via the header toggle.
+ */
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --ink: #f5f6f8; /* page background */
+  --surface: #ffffff; /* cards */
+  --surface-2: #eceff3; /* inputs, raised rows */
+  --line: #dde1e7; /* borders */
+
+  /* One step darker than the dark-mode orange: #f97316 on white sits under
+     3:1 contrast, which is too weak for text and icons. */
+  --accent: #ea580c;
+  --accent-soft: #f97316;
+  --accent-dim: #fed7aa; /* tint behind accent icons */
+
+  --content: #0b0d10; /* primary text */
+  --muted: #4c5561; /* secondary text */
+  --faint: #78818d; /* tertiary text */
+
+  --success: #16a34a;
+  --warn: #ca8a04;
+  --danger: #dc2626;
+
+  /* Chart series. Deliberately its own token rather than an alias of --accent:
+     the accent is tuned for text and icons, while a chart mark is validated
+     against the *card* surface for both contrast and OKLCH lightness. This one
+     step happens to clear both themes' bands, so it is identical in .dark —
+     don't "fix" that by pointing it at --accent, which fails the dark band. */
+  --chart-1: #ea580c;
+
+  /* Hero-only atmospherics: the athlete photo and glow washes need a different
+     ground in each theme to keep the headline legible on top of them. */
+  --hero-wash-1: rgba(234, 88, 12, 0.18);
+  --hero-wash-2: rgba(56, 118, 255, 0.14);
+  --hero-scrim: rgba(245, 246, 248, 0.86);
+  --hero-grid: rgba(11, 13, 16, 0.055);
+  /* Normal blend rather than luminosity: desaturating the athlete on a light
+     ground washed the figure out to a grey smudge. */
+  --hero-photo-blend: normal;
+  --hero-photo-opacity: 0.72;
+
+  color-scheme: light;
+}
+
+.dark {
+  --ink: #08090b;
+  --surface: #121417;
+  --surface-2: #1a1d21;
+  --line: #26292e;
+
+  --accent: #f97316;
+  --accent-soft: #fb923c;
+  --accent-dim: #7c2d12;
+
+  --content: #f4f4f5;
+  --muted: #9ca3af;
+  --faint: #6b7280;
+
+  --success: #22c55e;
+  --warn: #eab308;
+  --danger: #ef4444;
+
+  /* Same step as light — see the note there. */
+  --chart-1: #ea580c;
+
+  --hero-wash-1: rgba(249, 115, 22, 0.22);
+  --hero-wash-2: rgba(56, 118, 255, 0.16);
+  --hero-scrim: rgba(8, 9, 11, 0.82);
+  --hero-grid: rgba(244, 244, 245, 0.055);
+  --hero-photo-blend: normal;
+  --hero-photo-opacity: 0.85;
+
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-ink: var(--ink);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-dim: var(--accent-dim);
+
+  --color-content: var(--content);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+
+  --color-success: var(--success);
+  --color-warn: var(--warn);
+  --color-danger: var(--danger);
+
+  --color-chart-1: var(--chart-1);
+
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+
+  --radius-card: 1rem;
+}
+
+/* Ambient motion for the landing page. These run forever, so they are kept to
+   compositor-only properties (transform/opacity) and are disabled wholesale by
+   the reduced-motion block at the bottom of this file. */
+@theme {
+  --animate-float: float 7s ease-in-out infinite;
+  --animate-float-slow: float 11s ease-in-out infinite;
+  --animate-glow: glow 8s ease-in-out infinite;
+  --animate-grid-pan: grid-pan 24s linear infinite;
+  --animate-sheen: sheen 3.2s ease-in-out infinite;
+  --animate-ping-ring: ping-ring 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-14px);
+    }
+  }
+
+  @keyframes glow {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0) scale(1);
+      opacity: 0.7;
+    }
+    50% {
+      transform: translate3d(3%, -4%, 0) scale(1.15);
+      opacity: 1;
+    }
+  }
+
+  @keyframes grid-pan {
+    from {
+      background-position: 0 0;
+    }
+    to {
+      background-position: 56px 56px;
+    }
+  }
+
+  @keyframes sheen {
+    0% {
+      transform: translateX(-120%) skewX(-18deg);
+    }
+    60%,
+    100% {
+      transform: translateX(240%) skewX(-18deg);
+    }
+  }
+
+  @keyframes ping-ring {
+    0% {
+      transform: scale(1);
+      opacity: 0.55;
+    }
+    80%,
+    100% {
+      transform: scale(2.4);
+      opacity: 0;
+    }
+  }
+}
+
+@layer base {
+  * {
+    border-color: var(--color-line);
+  }
+
+  body {
+    background-color: var(--color-ink);
+    color: var(--color-content);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Numeric inputs in the workout logger get used mid-set with sweaty hands on
+     a phone. Kill the spinners and keep the tap target large. */
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-card);
+  }
+
+  .btn-primary {
+    background-color: var(--color-accent);
+    color: #0b0b0c;
+    font-weight: 600;
+    border-radius: 0.75rem;
+    padding: 0.75rem 1.25rem;
+    transition: filter 120ms ease;
+  }
+  .btn-primary:hover {
+    filter: brightness(1.08);
+  }
+  .btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .btn-ghost {
+    background-color: var(--color-surface-2);
+    color: var(--color-content);
+    border: 1px solid var(--color-line);
+    font-weight: 500;
+    border-radius: 0.75rem;
+    padding: 0.75rem 1.25rem;
+  }
+  .btn-ghost:hover {
+    background-color: var(--color-line);
+  }
+
+  .field {
+    width: 100%;
+    background-color: var(--color-surface-2);
+    border: 1px solid var(--color-line);
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    color: var(--color-content);
+    font-size: 1rem; /* 16px — stops iOS Safari zooming on focus */
+  }
+  .field::placeholder {
+    color: var(--color-faint);
+  }
+  .field:focus {
+    border-color: var(--color-accent);
+    outline: none;
+  }
+
+  .label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-muted);
+    margin-bottom: 0.375rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /*
+   * Entrance reveals need an override rather than a duration clamp.
+   *
+   * Framer applies its `initial` state as an inline style on the first render,
+   * and useReducedMotion() resolves to null during SSR and that same first
+   * render — so a `reduce ? false : {...}` guard is read too late and the
+   * element is already committed as hidden. Elements tagged data-motion-reveal
+   * are forced to their resting state here, which outranks the inline style and
+   * leaves the page fully readable without any movement.
+   */
+  [data-motion-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+}
