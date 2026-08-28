@@ -88,6 +88,36 @@ Open <http://localhost:3000>.
 
 ---
 
+## Deploying (Vercel)
+
+`.env.local` is gitignored, so it never reaches the host. The same three
+variables have to be set again in the hosting project or the build fails —
+this is the single most common first-deploy error:
+
+```
+Error: NEXT_PUBLIC_SUPABASE_URL is not set
+Error occurred prerendering page "/signup"
+```
+
+`/login` and `/signup` are client components, but Next still runs them
+through a server pass to prerender their HTML at build time. That pass calls
+`createClient()`, which reads the Supabase config — so a missing variable
+breaks the *build*, not just the running app.
+
+In the Vercel project, under Settings -> Environment Variables, add:
+
+| Variable | Where it comes from |
+| --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase -> Project Settings -> API |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | same page, the publishable/anon key |
+| `GEMINI_API_KEY` | aistudio.google.com/apikey |
+
+Tick every environment you build (Production, Preview, Development), then
+**redeploy**. `NEXT_PUBLIC_` values are inlined into the bundle at build time,
+so adding them after a failed build does nothing until a new build runs.
+
+`SUPABASE_SERVICE_ROLE_KEY` is not needed and should not be set on the host.
+
 ## Architecture notes
 
 **Math in code, judgment in the AI.** Calorie and macro targets are computed in

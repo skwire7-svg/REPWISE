@@ -15,8 +15,14 @@
 function required(name: string, value: string | undefined): string {
   if (!value) {
     throw new Error(
-      `${name} is not set. Copy .env.local.example to .env.local and fill it in, ` +
-        `then restart the dev server — Next.js only reads env files at startup.`,
+      `${name} is not set.\n` +
+        `  Locally: copy .env.local.example to .env.local, fill it in, and restart ` +
+        `the dev server — Next.js only reads env files at startup.\n` +
+        `  On Vercel (or any host): add it under the project's Environment Variables ` +
+        `and redeploy. .env.local is gitignored and never reaches the host, so a ` +
+        `working local build says nothing about the deployed one. NEXT_PUBLIC_ ` +
+        `values are inlined at build time, so they must exist before the build ` +
+        `runs — adding them afterwards needs a fresh deploy, not a restart.`,
     );
   }
   return value;
